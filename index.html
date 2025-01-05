@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      :root {
+        --bg-color: #fff;
+        --font-color: #000;
+        --bg2: red;
+        background-color: var(--bg-color);
+      }
+      :root.dark {
+        --bg-color: #000;
+        --font-color: #fff;
+        --bg2: blue;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation: none;
+      }
+      .dark::view-transition-old(root) {
+        z-index: 9999;
+      }
+      #btn {
+        position: absolute;
+        top: 10%;
+        right: 50px;
+        transform: translate(-50%, -50%);
+        color: var(--font-color);
+      }
+      .red {
+        width: 300px;
+        height: 300px;
+        background-color: var(--bg2);
+      }
+    </style>
+  </head>
+  <body>
+    <button id="btn">切换</button>
+    <div class="red"></div>
+  </body>
+  <script>
+    btn.addEventListener("click", (e) => {
+      const transition = document.startViewTransition(() => {
+        document.documentElement.classList.toggle("dark");
+      });
+      transition.ready.then(() => {
+        const isDark = document.documentElement.classList.contains("dark");
+        const x = e.clientX;
+        const y = e.clientY;
+        const radius = Math.sqrt(
+          document.body.scrollWidth ** 2 + document.body.scrollHeight ** 2
+        );
+
+        const clipPath = [
+          `circle(0 at ${x}px ${y}px)`,
+          `circle(${radius}px at ${x}px ${y}px)`,
+        ];
+        document.documentElement.animate(
+          { clipPath: isDark ? clipPath.reverse() : clipPath },
+          {
+            duration: 500,
+            easing: "linear",
+            pseudoElement: isDark
+              ? "::view-transition-old(root)"
+              : "::view-transition-new(root)",
+          }
+        );
+      });
+    });
+  </script>
+</html>
