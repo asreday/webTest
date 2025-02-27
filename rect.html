@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resizable Rectangle</title>
+    <style>
+      #rectangle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 150px;
+        background-color: lightblue;
+        border: 2px solid #000;
+      }
+      .anchor {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        cursor: pointer;
+      }
+      #top-left {
+        top: -5px;
+        left: -5px;
+      }
+      #top-right {
+        top: -5px;
+        right: -5px;
+      }
+      #bottom-left {
+        bottom: -5px;
+        left: -5px;
+      }
+      #bottom-right {
+        bottom: -5px;
+        right: -5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="rectangle">
+      <div id="top-left" class="anchor"></div>
+      <div id="top-right" class="anchor"></div>
+      <div id="bottom-left" class="anchor"></div>
+      <div id="bottom-right" class="anchor"></div>
+    </div>
+
+    <script>
+      const rectangle = document.getElementById("rectangle");
+      const anchors = document.querySelectorAll(".anchor");
+
+      let isDragging = false;
+      let currentAnchor = null;
+      let initialMouseX, initialMouseY;
+      let initialWidth, initialHeight;
+
+      anchors.forEach((anchor) => {
+        anchor.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          currentAnchor = e.target;
+          initialMouseX = e.clientX;
+          initialMouseY = e.clientY;
+          initialWidth = rectangle.offsetWidth;
+          initialHeight = rectangle.offsetHeight;
+
+          document.addEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onMouseUp);
+        });
+      });
+
+      function onMouseMove(e) {
+        if (!isDragging) return;
+
+        const dx = e.clientX - initialMouseX;
+        const dy = e.clientY - initialMouseY;
+
+        let newWidth = initialWidth;
+        let newHeight = initialHeight;
+
+        if (currentAnchor.id === "top-left") {
+          newWidth = initialWidth - dx;
+          newHeight = initialHeight - dy;
+        } else if (currentAnchor.id === "top-right") {
+          newWidth = initialWidth + dx;
+          newHeight = initialHeight - dy;
+        } else if (currentAnchor.id === "bottom-left") {
+          newWidth = initialWidth - dx;
+          newHeight = initialHeight + dy;
+        } else if (currentAnchor.id === "bottom-right") {
+          newWidth = initialWidth + dx;
+          newHeight = initialHeight + dy;
+        }
+
+        rectangle.style.width = `${newWidth}px`;
+        rectangle.style.height = `${newHeight}px`;
+      }
+
+      function onMouseUp() {
+        isDragging = false;
+        currentAnchor = null;
+
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
+    </script>
+  </body>
+</html>
